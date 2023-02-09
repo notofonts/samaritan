@@ -191,9 +191,9 @@ lookup MarkToMark14 {
 
 } MarkToMark14;
 
-feature calt {
+feature rclt {
     lookup ChainedContextualGSUB1;
-} calt;
+} rclt;
 
 feature dist {
     lookup ChainedContextualGPOS1;
