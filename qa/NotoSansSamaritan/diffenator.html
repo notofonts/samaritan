@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto">
+
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Diffenator3</title>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js" crossorigin="anonymous"></script>
+	<script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+		integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+		crossorigin="anonymous"></script>
+	<style type="text/css">
+		@font-face {
+      font-family: "Font Before";
+      src: url();
+    }
+
+    @font-face {
+      font-family: "Font After";
+      src: url();
+    }
+
+    .font-before, .font-after {
+      font-variation-settings: "wght" 400, "wdth" 100;
+    }
+
+    .font-before {
+      font-family: "Font Before", "Adobe Notdef";
+    }
+
+    .font-after {
+      font-family: "Font After", "Adobe Notdef";
+    }
+
+	:root {
+	--node-pt-size: 40px;
+	}
+
+	@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+body {
+    background-color: #b3d4f5 !important;
+    font-family: "Montserrat", sans-serif !important;
+}
+
+.nav-pills .nav-item.show .nav-link, .nav-pills .nav-link.active {
+    background-color: #ced9e4 !important;
+}
+.nav-item {
+    width: 100%;
+    margin-bottom: 10px;
+    padding: 2px;
+}
+
+.nav-pills .nav-link{
+    background-color: #9fcaf5 !important;
+}
+h4 {
+    color: #6f7882 !important;
+}
+
+@font-face {
+    font-family: "Adobe NotDef";
+    src: url(https://cdn.jsdelivr.net/gh/adobe-fonts/adobe-notdef/AND-Regular.ttf);
+}
+
+.box-title {
+    width: 100%;
+    font-size: 8pt;
+    font-weight: 700;
+    border-top: 1px solid black;
+    padding-top: 5px;
+    margin-bottom: 10pt;
+    display: block;
+}
+
+.box {
+    margin-bottom: 20pt;
+    width: 100%;
+    float: left;
+}
+
+.box-text {}
+
+#ui-nav {
+    position: fixed;
+    right: 20px;
+    z-index: 100;
+}
+
+#font-toggle {}
+
+.ui-nav-item {
+    display: block;
+    cursor: pointer;
+    -webkit-user-select: none;
+    /* Safari */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* IE10+/Edge */
+    user-select: none;
+    /* Standard */
+    text-align: center;
+    color: white;
+    background-color: black;
+    display: block;
+    font-size: 14pt;
+    padding: 5px;
+    margin: 2px;
+}
+
+/* Stuff needed for the table differ */
+body {
+    font-family: Helvetica;
+}
+
+.node {
+    font-family: courier;
+    cursor: pointer;
+    position: relative;
+    left: 30px;
+    padding: 5px;
+    display: block;
+    border: 1px dashed grey;
+    background-color: #e9e9ee;
+}
+
+.header {
+    font-weight: bold;
+}
+
+.attr-before {
+    color: green;
+    cursor: text;
+}
+
+.attr-after {
+    color: red;
+    cursor: text;
+}
+
+.leaf {
+    font-weight: bold;
+}
+
+.old .cell .new {
+    display: none;
+}
+
+.new .cell .old {
+    display: none;
+}
+
+.both .cell .old {
+    opacity: 0.75;
+    color: red;
+}
+
+.both .cell .new {
+    opacity: 0.75;
+    position: absolute;
+    top: 0;
+    color: green;
+}
+
+.spacer {
+    display: block;
+    float: left;
+    width: 100%;
+}
+
+#ot-panel {
+    max-height: 400px;
+    overflow-y: scroll;
+    background: white;
+    padding: 10px;
+    display: none;
+   }
+
+   .cell{
+    z-index: -100;
+    float: left;
+    display: block;
+    text-align: center;
+    padding: 5pt;
+    margin: 5pt;
+    width: 50pt;
+    font-size: var(--node-pt-size);
+    line-height: calc(var(--node-pt-size) * 1.5);
+  }
+  .cell-word{
+    z-index: -100;
+    float: left;
+    display: block;
+    text-align: center;
+    padding: 5pt;
+    margin: 5pt;
+    font-size: var(--node-pt-size);
+    line-height: calc(var(--node-pt-size) * 1.5);
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+  }
+  .cell-glyph{
+    z-index: -100;
+    float: left;
+    display: block;
+    text-align: center;
+    border-radius: 5pt;
+    box-shadow: rgba(0, 0, 0, 0.15) 1.95px 1.95px 2.6px;
+    padding: 5pt;
+    margin: 5pt;
+    width: calc(var(--node-pt-size) * 2);
+    min-height: calc(var(--node-pt-size) * 2);
+    font-size: var(--node-pt-size);
+  }
+  .cell-glyph.font-before, .cell-word.font-before {
+    background: #eff6f2;
+  }
+  .cell-glyph.font-after, .cell-word.font-after {
+    background: #f7f4f4;
+  }
+
+  .cell-glyph:hover {
+    box-shadow: none;
+    background: #f0f0f5;
+  }
+  .cat-strings .cell {
+    clear: both;
+    position: static;
+    float: none;
+    text-align: left;
+  }
+  .codepoint {
+    text-align: center;
+    font-family: sans-serif;
+    font-size: 10pt;
+    line-height: 10pt;
+  }
+  .box-title {
+    clear: both;
+  }
+  .node.closed::before {
+    content: "+";
+    margin-right: 5pt;
+  }
+  .node.open::before {
+    content: "-";
+    margin-right: 5pt;
+  }
+
+  .tooltip pre {
+    background-color: #6f7882;
+    padding: 5px;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+  .tooltip {
+    line-height: 1em;
+  }
+  .tooltip-inner {
+    max-width: 300px;
+  }
+
+  h1,h2,h3,h4,h5 {
+    clear: both;
+  }
+
+  #locationnav li {
+    white-space: wrap;
+  }
+
+  #userdefined div { width: 100%; }
+  
+/* The following rules are used in the WASM version, not in the CLI version.
+   But we keep them here so we can share them between the two versions. */
+
+   .modal-dialog {
+    max-width: 100% !important;
+    margin: 0 !important;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 100vh;
+    display: flex;
+  }
+
+  .fontdrop {
+    padding: 30px;
+    border-radius: 20px;
+    outline: 3px dashed #ffffffff;
+    outline-offset: -20px;
+  }
+
+  #fontbefore {
+    background-color: #ddffdddd;
+  }
+
+  #fontafter {
+    background-color: #ffdddddd;
+  }
+
+  .dragging {
+    background-image: linear-gradient(rgb(0 0 0/5%) 0 0);
+    outline: 5px dashed #ffffffff;
+  }
+
+  #diffkerns {
+    max-height: 500px;
+    overflow-y: scroll;
+  }
+		</style>
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+	integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+</head>
+
+<body>
+
+		<div id="ui-nav">
+		  <div class="ui-nav-item" id="fonttoggle">Old</div>
+		  <div class="ui-nav-item" id="fontanimate">Animate</div>
+		  <div id="axes">
+		  </div>
+		</div>
+	
+	<div class="row">
+		<div class="col-2">
+			<ul class="nav nav-pills" id="locationnav">
+			</ul>
+		</div>
+		<div class="col-9 mt-3">
+			<div id="title"></div>
+			<div id="cmapdiff"> </div>
+			<div id="main"></div>
+			<div id="userdefined">
+				<h4>User defined sample text</h4>
+				<div contenteditable="true" class="font-before cell-word">
+					You can type your own text here to see it previewed in the fonts.
+				</div>
+				<div style="clear: both"></div>
+			</div>
+			<div id="diffkerns"> </div>
+			<div id="difftable"> </div>
+		</div>
+	</div>
+	<script type="module">
+		function renderTableDiff(node, toplevel) {
+  var wrapper = $("<div> </div>");
+  if (!node) {
+    return wrapper;
+  }
+  if (Array.isArray(node) && node.length == 2) {
+    var before = $("<span/>");
+    before.addClass("attr-before");
+    before.html(" " + node[0] + " ");
+    var after = $("<span/>");
+    after.addClass("attr-after");
+    after.append(renderTableDiff(node[1], true).children());
+    wrapper.append(before);
+    wrapper.append(after);
+    return wrapper;
+  }
+  if (node.constructor != Object) {
+    var thing = $("<span/>");
+    thing.html(node);
+    wrapper.append(thing);
+    return wrapper;
+  }
+  for (const [key, value] of Object.entries(node)) {
+    var display = $("<div/>");
+    display.addClass("node");
+    if (!toplevel) {
+      display.hide();
+    }
+    display.append(key);
+    display.append(renderTableDiff(value, false).children());
+    if (display.children(".node").length > 0) {
+      display.addClass("closed");
+    }
+    wrapper.append(display);
+  }
+  return wrapper;
+}
+
+function addAGlyph(glyph, where) {
+  let title = "";
+  if (glyph.name) {
+    title = "name: " + glyph.name;
+  }
+  let cp =
+    "<br>U+" +
+    glyph.string.codePointAt(0).toString(16).padStart(4, "0").toUpperCase();
+  where.append(`
+        <div class="cell-glyph font-before">
+        <div data-toggle="tooltip" data-html="true" data-title="${glyph.differing_pixels} pixels"> ${glyph.string}
+        <div class="codepoint" data-toggle="tooltip" data-html="true" data-title="${title}">
+		${cp}
+        </div>
+        </div>
+    `);
+}
+
+function addAWord(diff, where) {
+  if (!diff.buffer_b) {
+    diff.buffer_b = diff.buffer_a;
+  }
+  where.append(`
+		<div class="cell-word font-before">
+		<span data-toggle="tooltip" data-html="true" data-title="Before: <pre>${diff.buffer_a}</pre>After: <pre>${diff.buffer_b}</pre><br>difference: ${diff.differing_pixels} pixels">
+		${diff.word}
+		</span>
+		</div>
+	`);
+}
+
+function diffTables(report) {
+  $("#difftable").empty();
+  $("#difftable").append(`<h4 class="mt-2 box-title">Table-level details</h4>`);
+  $("#difftable").append(
+    renderTableDiff({ tables: report["tables"] }, true).children()
+  );
+  $("#difftable .node").on("click", function (e) {
+    $(this).toggleClass("closed open");
+    $(this).children(".node").toggle();
+    e.stopPropagation();
+  });
+}
+function diffKerns(report) {
+  $("#diffkerns").empty();
+  $("#diffkerns").append(`<h4 class="mt-2">Modified Kerns</h4>`);
+  $("#diffkerns").append(
+    `<table class="table table-striped" id="diffkerns"><tr><th>Pair</th><th>Old</old><th>New</th></table>`
+  );
+  for (let [pair, value] of Object.entries(report["kerns"])) {
+    if (pair == "error") {
+      $("#diffkerns").append(`<p class="text-danger">Error: ${value}</p>`);
+      continue;
+    } else {
+      let row = $("<tr>");
+      row.append(`<td>${pair}</td>`);
+      row.append(`<td>${serializeKernBefore(value)}</td>`);
+      row.append(`<td>${serializeKernAfter(value)}</td>`);
+      $("#diffkerns table").append(row);
+    }
+  }
+}
+
+function serializeKernBefore(kern) {
+  if (Array.isArray(kern)) {
+    return serializeKern(kern[0], -1);
+  }
+  return serializeKern(kern, 0);
+}
+
+function serializeKernAfter(kern) {
+  if (Array.isArray(kern)) {
+    return serializeKern(kern[1], -1);
+  }
+  return serializeKern(kern, 1);
+}
+
+function serializeKern(kern, index) {
+  let string = "";
+  if (kern === null || kern === undefined) {
+    return "(null)";
+  }
+  if (kern.x) {
+    string += serializeKernValue(kern.x, index);
+  } else if (kern.y) {
+    string = "0";
+  }
+
+  if (kern.y) {
+    string += "," + serializeKernValue(kern.y, index);
+  }
+  if (!kern.x_placement && !kern.y_placement) {
+    return string;
+  }
+  string += "@";
+  if (kern.x_placement) {
+    string += serializeKernValue(kern.x_placement, index);
+  } else if (kern.y_placement) {
+    string += "0";
+  }
+  if (kern.y_placement) {
+    string += "," + serializeKernValue(kern.y_placement, index);
+  }
+  return string;
+}
+
+function serializeKernValue(kern, index) {
+  if (typeof kern == "number") {
+    return kern;
+  }
+  let string = "(";
+  let verybig = Object.entries(kern).length > 5;
+  for (let [key, value] of Object.entries(kern)) {
+    if (key == "default") {
+      string += value[index] + " ";
+    } else {
+      string += value[index] + "@" + key + " ";
+    }
+    if (verybig) {
+      string += "<br>";
+    }
+  }
+  return string.trim() + ")";
+}
+
+function cmapDiff(report) {
+  if (report.cmap_diff && (report.cmap_diff.new || report.cmap_diff.missing)) {
+    $("#cmapdiff").append(
+      `<h4 class="mt-2">Added and Removed Encoded Glyphs</h4>`
+    );
+    if (report["cmap_diff"]["new"]) {
+      $("#cmapdiff").append(`<h4 class="box-title">Added Glyphs</h4>`);
+      let added = $("<div>");
+      for (let glyph of report["cmap_diff"]["new"]) {
+        addAGlyph(glyph, added);
+      }
+      $("#cmapdiff").append(added);
+    }
+
+    if (report["cmap_diff"]["missing"]) {
+      $("#cmapdiff").append(`<h4 class="box-title">Removed Glyphs</h4>`);
+      let missing = $("<div>");
+      for (let glyph of report["cmap_diff"]["missing"]) {
+        addAGlyph(glyph, missing);
+      }
+      $("#cmapdiff").append(missing);
+    }
+  } else {
+    $("#cmapdiff").append(`<p>No changes to encoded glyphs</p>`);
+  }
+}
+
+function setupAnimation() {
+  $("#fonttoggle").click(function () {
+    if ($(this).text() == "Old") {
+      $(this).text("New");
+      $(".font-before").removeClass("font-before").addClass("font-after");
+    } else {
+      $(this).text("Old");
+      $(".font-after").removeClass("font-after").addClass("font-before");
+    }
+  });
+
+  let animationHandle;
+  function animate() {
+    $("#fonttoggle").click();
+    animationHandle = setTimeout(animate, 1000);
+  }
+  $("#fontanimate").click(function () {
+    if ($(this).text() == "Animate") {
+      $(this).text("Stop");
+      animate();
+    } else {
+      $(this).text("Animate");
+      clearTimeout(animationHandle);
+    }
+  });
+}
+
+export {
+  renderTableDiff,
+  addAGlyph,
+  addAWord,
+  cmapDiff,
+  diffTables,
+  diffKerns,
+  setupAnimation,
+};
+
+	var report = {"tables":{"GDEF":{"glyph_classes":{"uni0830":["Base",null],"uni0831":["Base",null],"uni0832":["Base",null],"uni0833":["Base",null],"uni0834":["Base",null],"uni0835":["Base",null],"uni0836":["Base",null],"uni0837":["Base",null],"uni0838":["Base",null],"uni0839":["Base",null],"uni083A":["Base",null],"uni083B":["Base",null],"uni083C":["Base",null],"uni083D":["Base",null],"uni083E":["Base",null],"uni2E31":["Base",null],"uni25CC":[null,"Base"]},"mark_glyph_sets":[null,{"0":["uni0818","uni0819","uni082C","uni082D","uni0818.alt"],"1":["uni0816","uni0817","uni0818","uni0819","uni081B","uni082C","uni082D","uni0818.alt"],"2":["uni0818","uni0819","uni081B","uni081C","uni081D","uni081E","uni081F","uni0820","uni0821","uni0822","uni0823","uni0825","uni0826","uni0827","uni0829","uni082A","uni082B","uni082C","uni082D","uni0818.alt"],"3":["uni081C","uni081D","uni081E","uni081F","uni0820","uni0821","uni0822","uni0823","uni0825","uni0826","uni0827","uni0829","uni082A","uni082B"]}]},"GPOS":{"feature_list":{"dist":{"0":[1,0],"1":[3,null]},"mark":{"0":[4,2],"1":[5,3],"2":[null,4]},"mkmk":{"0":[6,5],"1":[7,6],"2":[8,7],"3":[9,8]}},"lookup_list":{"0":{"0":{"type":["single","chained_sequence_context"],"uni081C":[{"x":293,"x_placement":293},null],"uni081D":[{"x":293,"x_placement":293},null],"uni081E":[{"x":293,"x_placement":293},null],"uni081F":[{"x":293,"x_placement":293},null],"uni0820":[{"x":293,"x_placement":293},null],"uni0821":[{"x":293,"x_placement":293},null],"uni0822":[{"x":293,"x_placement":293},null],"uni0823":[{"x":293,"x_placement":293},null],"uni0825":[{"x":293,"x_placement":293},null],"uni0826":[{"x":293,"x_placement":293},null],"uni0827":[{"x":293,"x_placement":293},null],"uni0829":[{"x":293,"x_placement":293},null],"uni082A":[{"x":293,"x_placement":293},null],"uni082B":[{"x":293,"x_placement":293},null],"rules":[null,["[uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]' lookup lookup_1 [uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]"]]},"1":[null,{"type":"chained_sequence_context","rules":["[uni081A uni0824 uni0828]' lookup lookup_1 [uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]"]}]},"1":{"0":{"type":["chained_sequence_context","single"],"rules":[["[uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]' lookup lookup_0 [uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]"],null],"uni081A":[null,{"x":293,"x_placement":293}],"uni081C":[null,{"x":293,"x_placement":293}],"uni081D":[null,{"x":293,"x_placement":293}],"uni081E":[null,{"x":293,"x_placement":293}],"uni081F":[null,{"x":293,"x_placement":293}],"uni0820":[null,{"x":293,"x_placement":293}],"uni0821":[null,{"x":293,"x_placement":293}],"uni0822":[null,{"x":293,"x_placement":293}],"uni0823":[null,{"x":293,"x_placement":293}],"uni0824":[null,{"x":293,"x_placement":293}],"uni0825":[null,{"x":293,"x_placement":293}],"uni0826":[null,{"x":293,"x_placement":293}],"uni0827":[null,{"x":293,"x_placement":293}],"uni0828":[null,{"x":293,"x_placement":293}],"uni0829":[null,{"x":293,"x_placement":293}],"uni082A":[null,{"x":293,"x_placement":293}],"uni082B":[null,{"x":293,"x_placement":293}]}},"2":{"0":{"type":["single","mark_to_base"],"uni081A":[{"x":293,"x_placement":293},null],"uni0824":[{"x":293,"x_placement":293},null],"uni0828":[{"x":293,"x_placement":293},null],"marks":[null,{"anchor_0":{"uni0816":{"x":136,"y":800},"uni0817":{"x":97,"y":800}}}],"bases":[null,{"uni0800":{"anchor_0":{"x":729,"y":732}},"uni0801":{"anchor_0":{"x":537,"y":732}},"uni0802":{"anchor_0":{"x":585,"y":732}},"uni0803":{"anchor_0":{"x":517,"y":732}},"uni0804":{"anchor_0":{"x":585,"y":732}},"uni0805":{"anchor_0":{"x":634,"y":732}},"uni0806":{"anchor_0":{"x":683,"y":732}},"uni0807":{"anchor_0":{"x":634,"y":732}},"uni0808":{"anchor_0":{"x":781,"y":732}},"uni0809":{"anchor_0":{"x":888,"y":751}},"uni080A":{"anchor_0":{"x":585,"y":732}},"uni080B":{"anchor_0":{"x":488,"y":732}},"uni080C":{"anchor_0":{"x":751,"y":732}},"uni080D":{"anchor_0":{"x":551,"y":732}},"uni080E":{"anchor_0":{"x":605,"y":732}},"uni080F":{"anchor_0":{"x":729,"y":732}},"uni0810":{"anchor_0":{"x":554,"y":732}},"uni0811":{"anchor_0":{"x":905,"y":732}},"uni0812":{"anchor_0":{"x":561,"y":732}},"uni0813":{"anchor_0":{"x":532,"y":732}},"uni0814":{"anchor_0":{"x":708,"y":751}},"uni0815":{"anchor_0":{"x":781,"y":732}},"uni25CC":{"anchor_0":{"x":625,"y":732}}}]}},"3":{"0":{"type":["chained_sequence_context","mark_to_base"],"rules":[["[uni081A uni0824 uni0828]' lookup lookup_2 [uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]"],null],"marks":[null,{"anchor_0":{"uni0818":{"x":327,"y":800},"uni0819":{"x":87,"y":820},"uni081B":{"x":175,"y":800},"uni082C":{"x":107,"y":830},"uni082D":{"x":87,"y":800},"uni0818.alt":{"x":185,"y":800}}}],"bases":[null,{"uni0800":{"anchor_0":{"x":458,"y":732}},"uni0801":{"anchor_0":{"x":322,"y":732}},"uni0802":{"anchor_0":{"x":341,"y":732}},"uni0803":{"anchor_0":{"x":312,"y":732}},"uni0804":{"anchor_0":{"x":341,"y":732}},"uni0805":{"anchor_0":{"x":341,"y":732}},"uni0806":{"anchor_0":{"x":410,"y":791}},"uni0807":{"anchor_0":{"x":361,"y":751}},"uni0808":{"anchor_0":{"x":488,"y":742}},"uni0809":{"anchor_0":{"x":537,"y":732}},"uni080A":{"anchor_0":{"x":361,"y":732}},"uni080B":{"anchor_0":{"x":305,"y":947}},"uni080C":{"anchor_0":{"x":439,"y":732}},"uni080D":{"anchor_0":{"x":390,"y":732}},"uni080E":{"anchor_0":{"x":502,"y":732}},"uni080F":{"anchor_0":{"x":458,"y":732}},"uni0810":{"anchor_0":{"x":380,"y":732}},"uni0811":{"anchor_0":{"x":624,"y":732}},"uni0812":{"anchor_0":{"x":361,"y":742}},"uni0813":{"anchor_0":{"x":341,"y":732}},"uni0814":{"anchor_0":{"x":429,"y":751}},"uni0815":{"anchor_0":{"x":507,"y":732}},"uni25CC":{"anchor_0":{"x":401,"y":732}}}]}},"4":{"0":{"marks":{"anchor_0":{"uni0816":[{"x":136,"y":800},null],"uni0817":[{"x":97,"y":800},null],"uni081C":[null,{"x":-154,"y":800}],"uni081D":[null,{"x":-130,"y":800}],"uni081E":[null,{"x":-59,"y":800}],"uni081F":[null,{"x":-49,"y":800}],"uni0820":[null,{"x":-49,"y":800}],"uni0821":[null,{"x":-206,"y":800}],"uni0822":[null,{"x":-162,"y":800}],"uni0823":[null,{"x":-147,"y":800}],"uni0825":[null,{"x":-147,"y":800}],"uni0826":[null,{"x":-154,"y":800}],"uni0827":[null,{"x":-154,"y":800}],"uni0829":[null,{"x":-127,"y":800}],"uni082A":[null,{"x":-125,"y":800}],"uni082B":[null,{"x":-147,"y":800}]},"anchor_1":[{"uni0818":{"x":327,"y":800},"uni0819":{"x":87,"y":820},"uni081B":{"x":175,"y":800},"uni082C":{"x":107,"y":830},"uni082D":{"x":87,"y":800},"uni0818.alt":{"x":185,"y":800}},null]},"bases":{"uni0800":{"anchor_0":{"x":[729,48]},"anchor_1":[{"x":458,"y":732},null]},"uni0801":{"anchor_0":{"x":[537,48]},"anchor_1":[{"x":322,"y":732},null]},"uni0802":{"anchor_0":{"x":[585,48]},"anchor_1":[{"x":341,"y":732},null]},"uni0803":{"anchor_0":{"x":[517,48]},"anchor_1":[{"x":312,"y":732},null]},"uni0804":{"anchor_0":{"x":[585,48]},"anchor_1":[{"x":341,"y":732},null]},"uni0805":{"anchor_0":{"x":[634,48]},"anchor_1":[{"x":341,"y":732},null]},"uni0806":{"anchor_0":{"x":[683,48],"y":[732,791]},"anchor_1":[{"x":410,"y":791},null]},"uni0807":{"anchor_0":{"x":[634,48],"y":[732,751]},"anchor_1":[{"x":361,"y":751},null]},"uni0808":{"anchor_0":{"x":[781,48]},"anchor_1":[{"x":488,"y":742},null]},"uni0809":{"anchor_0":{"x":[888,48],"y":[751,732]},"anchor_1":[{"x":537,"y":732},null]},"uni080A":{"anchor_0":{"x":[585,48]},"anchor_1":[{"x":361,"y":732},null]},"uni080B":{"anchor_0":{"x":[488,-40]},"anchor_1":[{"x":305,"y":947},null]},"uni080C":{"anchor_0":{"x":[751,48]},"anchor_1":[{"x":439,"y":732},null]},"uni080D":{"anchor_0":{"x":[551,-137]},"anchor_1":[{"x":390,"y":732},null]},"uni080E":{"anchor_0":{"x":[605,-59]},"anchor_1":[{"x":502,"y":732},null]},"uni080F":{"anchor_0":{"x":[729,48]},"anchor_1":[{"x":458,"y":732},null]},"uni0810":{"anchor_0":{"x":[554,48]},"anchor_1":[{"x":380,"y":732},null]},"uni0811":{"anchor_0":{"x":[905,48]},"anchor_1":[{"x":624,"y":732},null]},"uni0812":{"anchor_0":{"x":[561,48]},"anchor_1":[{"x":361,"y":742},null]},"uni0813":{"anchor_0":{"x":[532,48]},"anchor_1":[{"x":341,"y":732},null]},"uni0814":{"anchor_0":{"x":[708,48]},"anchor_1":[{"x":429,"y":751},null]},"uni0815":{"anchor_0":{"x":[781,48]},"anchor_1":[{"x":507,"y":732},null]},"uni081A":[null,{"anchor_0":{"x":-171,"y":732}}],"uni0824":[null,{"anchor_0":{"x":-147,"y":732}}],"uni0828":[null,{"anchor_0":{"x":-147,"y":732}}],"uni25CC":[null,{"anchor_0":{"x":88,"y":732}}]}}},"5":{"0":{"type":["mark_to_base","mark_to_mark"],"marks":{"anchor_0":{"uni081C":[{"x":-154,"y":800},null],"uni081D":[{"x":-130,"y":800},null],"uni081E":[{"x":-59,"y":800},null],"uni081F":[{"x":-49,"y":800},null],"uni0820":[{"x":-49,"y":800},null],"uni0821":[{"x":-206,"y":800},null],"uni0822":[{"x":-162,"y":800},null],"uni0823":[{"x":-147,"y":800},null],"uni0825":[{"x":-147,"y":800},null],"uni0826":[{"x":-154,"y":800},null],"uni0827":[{"x":-154,"y":800},null],"uni0829":[{"x":-127,"y":800},null],"uni082A":[{"x":-125,"y":800},null],"uni082B":[{"x":-147,"y":800},null],"uni0819":[null,{"x":107,"y":800}],"uni082C":[null,{"x":107,"y":820}],"uni082D":[null,{"x":87,"y":800}]}},"bases":[{"uni0800":{"anchor_0":{"x":48,"y":732}},"uni0801":{"anchor_0":{"x":48,"y":732}},"uni0802":{"anchor_0":{"x":48,"y":732}},"uni0803":{"anchor_0":{"x":48,"y":732}},"uni0804":{"anchor_0":{"x":48,"y":732}},"uni0805":{"anchor_0":{"x":48,"y":732}},"uni0806":{"anchor_0":{"x":48,"y":791}},"uni0807":{"anchor_0":{"x":48,"y":751}},"uni0808":{"anchor_0":{"x":48,"y":732}},"uni0809":{"anchor_0":{"x":48,"y":732}},"uni080A":{"anchor_0":{"x":48,"y":732}},"uni080B":{"anchor_0":{"x":-40,"y":732}},"uni080C":{"anchor_0":{"x":48,"y":732}},"uni080D":{"anchor_0":{"x":-137,"y":732}},"uni080E":{"anchor_0":{"x":-59,"y":732}},"uni080F":{"anchor_0":{"x":48,"y":732}},"uni0810":{"anchor_0":{"x":48,"y":732}},"uni0811":{"anchor_0":{"x":48,"y":732}},"uni0812":{"anchor_0":{"x":48,"y":732}},"uni0813":{"anchor_0":{"x":48,"y":732}},"uni0814":{"anchor_0":{"x":48,"y":751}},"uni0815":{"anchor_0":{"x":48,"y":732}},"uni081A":{"anchor_0":{"x":-171,"y":732}},"uni0824":{"anchor_0":{"x":-147,"y":732}},"uni0828":{"anchor_0":{"x":-147,"y":732}}},null],"basemarks":[null,{"uni0818":{"anchor_0":{"x":317,"y":893}},"uni0818.alt":{"anchor_0":{"x":185,"y":893}}}]}},"6":{"0":{"marks":{"anchor_0":{"uni0819":{"x":[107,219],"y":[800,798]},"uni082C":{"x":[107,244],"y":[820,798]},"uni082D":{"x":[87,146],"y":[800,798]},"uni0818":[null,{"x":634,"y":798}],"uni081B":[null,{"x":366,"y":798}],"uni0818.alt":[null,{"x":366,"y":798}]}},"basemarks":{"uni0818":[{"anchor_0":{"x":317,"y":893}},null],"uni0818.alt":[{"anchor_0":{"x":185,"y":893}},null],"uni0816":[null,{"anchor_0":{"x":-74,"y":798}}],"uni0817":[null,{"anchor_0":{"x":-74,"y":798}}]}}},"7":{"0":{"marks":{"anchor_0":{"uni0818":[{"x":634,"y":798},null],"uni0819":[{"x":219,"y":798},null],"uni081B":[{"x":366,"y":798},null],"uni082C":[{"x":244,"y":798},null],"uni082D":[{"x":146,"y":798},null],"uni0818.alt":[{"x":366,"y":798},null],"uni081C":[null,{"x":-30,"y":0}],"uni081D":[null,{"x":-49,"y":0}],"uni081E":[null,{"x":0,"y":0}],"uni081F":[null,{"x":0,"y":0}],"uni0820":[null,{"x":0,"y":0}],"uni0821":[null,{"x":0,"y":0}],"uni0822":[null,{"x":0,"y":0}],"uni0823":[null,{"x":0,"y":0}],"uni0825":[null,{"x":-49,"y":0}],"uni0826":[null,{"x":0,"y":0}],"uni0827":[null,{"x":-25,"y":0}],"uni0829":[null,{"x":0,"y":0}],"uni082A":[null,{"x":0,"y":0}],"uni082B":[null,{"x":0,"y":0}]}},"basemarks":{"uni0816":[{"anchor_0":{"x":-74,"y":798}},null],"uni0817":[{"anchor_0":{"x":-74,"y":798}},null],"uni0818":[null,{"anchor_0":{"x":-40,"y":0}}],"uni0819":[null,{"anchor_0":{"x":-40,"y":0}}],"uni081B":[null,{"anchor_0":{"x":-40,"y":0}}],"uni082C":[null,{"anchor_0":{"x":-40,"y":0}}],"uni082D":[null,{"anchor_0":{"x":-40,"y":0}}],"uni0818.alt":[null,{"anchor_0":{"x":-40,"y":0}}]}}},"8":{"0":{"marks":{"anchor_0":{"uni081C":{"x":[-30,19],"y":[0,798]},"uni081D":{"x":[-49,-15],"y":[0,798]},"uni081E":{"y":[0,798]},"uni081F":{"y":[0,798]},"uni0820":{"y":[0,798]},"uni0821":{"y":[0,798]},"uni0822":{"y":[0,798]},"uni0823":{"y":[0,798]},"uni0825":{"x":[-49,9],"y":[0,798]},"uni0826":{"y":[0,798]},"uni0827":{"y":[0,798]},"uni0829":{"y":[0,798]},"uni082A":{"y":[0,798]},"uni082B":{"y":[0,798]}}},"basemarks":{"uni0818":[{"anchor_0":{"x":-40,"y":0}},null],"uni0819":[{"anchor_0":{"x":-40,"y":0}},null],"uni081B":[{"anchor_0":{"x":-40,"y":0}},null],"uni082C":[{"anchor_0":{"x":-40,"y":0}},null],"uni082D":[{"anchor_0":{"x":-40,"y":0}},null],"uni0818.alt":[{"anchor_0":{"x":-40,"y":0}},null],"uni081C":[null,{"anchor_0":{"x":-303,"y":798}}],"uni081D":[null,{"anchor_0":{"x":-303,"y":798}}],"uni081E":[null,{"anchor_0":{"x":-147,"y":798}}],"uni081F":[null,{"anchor_0":{"x":-137,"y":798}}],"uni0820":[null,{"anchor_0":{"x":-127,"y":798}}],"uni0821":[null,{"anchor_0":{"x":-440,"y":798}}],"uni0822":[null,{"anchor_0":{"x":-391,"y":798}}],"uni0823":[null,{"anchor_0":{"x":-333,"y":798}}],"uni0825":[null,{"anchor_0":{"x":-245,"y":798}}],"uni0826":[null,{"anchor_0":{"x":-342,"y":798}}],"uni0827":[null,{"anchor_0":{"x":-313,"y":798}}],"uni0829":[null,{"anchor_0":{"x":-303,"y":798}}],"uni082A":[null,{"anchor_0":{"x":-284,"y":798}}],"uni082B":[null,{"anchor_0":{"x":-347,"y":798}}]}}},"9":[[{"type":"mark_to_mark","marks":{"anchor_0":{"uni081C":{"x":19,"y":798},"uni081D":{"x":-15,"y":798},"uni081E":{"x":0,"y":798},"uni081F":{"x":0,"y":798},"uni0820":{"x":0,"y":798},"uni0821":{"x":0,"y":798},"uni0822":{"x":0,"y":798},"uni0823":{"x":0,"y":798},"uni0825":{"x":9,"y":798},"uni0826":{"x":0,"y":798},"uni0827":{"x":-25,"y":798},"uni0829":{"x":0,"y":798},"uni082A":{"x":0,"y":798},"uni082B":{"x":0,"y":798}}},"basemarks":{"uni081C":{"anchor_0":{"x":-303,"y":798}},"uni081D":{"anchor_0":{"x":-303,"y":798}},"uni081E":{"anchor_0":{"x":-147,"y":798}},"uni081F":{"anchor_0":{"x":-137,"y":798}},"uni0820":{"anchor_0":{"x":-127,"y":798}},"uni0821":{"anchor_0":{"x":-440,"y":798}},"uni0822":{"anchor_0":{"x":-391,"y":798}},"uni0823":{"anchor_0":{"x":-333,"y":798}},"uni0825":{"anchor_0":{"x":-245,"y":798}},"uni0826":{"anchor_0":{"x":-342,"y":798}},"uni0827":{"anchor_0":{"x":-313,"y":798}},"uni0829":{"anchor_0":{"x":-303,"y":798}},"uni082A":{"anchor_0":{"x":-284,"y":798}},"uni082B":{"anchor_0":{"x":-347,"y":798}}}}],null]}},"GSUB":{"feature_list":{"calt":[[1],null],"rclt":[null,[0]]},"lookup_list":{"0":{"0":{"type":["single","chained_sequence_context"],"uni0818":["uni0818.alt",null],"rules":[null,["[uni0816 uni0817] uni0818' lookup lookup_1"]]},"1":[null,{"type":"chained_sequence_context","rules":["uni0818' lookup lookup_1 [uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]"]}],"2":[null,{"type":"chained_sequence_context","rules":["[uni080D uni080E] uni0818' lookup lookup_1"]}]},"1":{"0":{"type":["chained_sequence_context","single"],"rules":[["[uni0816 uni0817] uni0818' lookup lookup_0"],null],"uni0818":[null,"uni0818.alt"]},"1":[{"type":"chained_sequence_context","rules":["uni0818' lookup lookup_0 [uni081C uni081D uni081E uni081F uni0820 uni0821 uni0822 uni0823 uni0825 uni0826 uni0827 uni0829 uni082A uni082B]"]},null],"2":[{"type":"chained_sequence_context","rules":["[uni080D uni080E] uni0818' lookup lookup_0"]},null]}}},"OS/2":{"panose_10":{"0":[2,0],"1":[11,0],"2":[5,0],"3":[2,0],"4":[4,0],"5":[5,0],"6":[4,0],"7":[2,0],"8":[2,0],"9":[4,0]},"ul_code_page_range_1":[1,0]},"cmap":{"U+25CC":[null,"uni25CC"]},"head":{"checksum_adjustment":[3077106370,734688640],"modified":[3746876334,3813910713]},"hhea":{"caret_slope_rise":[1,1000],"number_of_long_metrics":[68,69]},"hmtx":{"uni25CC":[null,{"width":727,"lsb":74}]},"loca":{"offsets":{"69":[null,6492]}},"maxp":{"num_glyphs":[68,69],"max_points":[81,144],"max_contours":[4,12]},"post":{"num_glyphs":[68,69],"glyph_name_index":{"68":[null,324]}}},"cmap_diff":{"new":[{"string":"◌","name":"DOTTED CIRCLE"}]},"locations":[{"location":"Default","words":{}}]};
+		function buildLocation_statichtml(loc) {
+  // Set font styles to appropriate axis locations
+  let rule = document.styleSheets[0].cssRules[2].style;
+  let cssSetting = "";
+  let textLocation = "Default";
+  if (loc.coords) {
+    cssSetting = Object.entries(loc.coords)
+      .map(function ([axis, value]) {
+        return `"${axis}" ${value}`;
+      })
+      .join(", ");
+    textLocation = Object.entries(loc.coords)
+      .map(function ([axis, value]) {
+        return `${axis}=${value}`;
+      })
+      .join(" ");
+    rule.setProperty("font-variation-settings", cssSetting);
+  }
+
+  $("#main").empty();
+
+  $("#title").html(`<h4 class="mt-2">${textLocation}</h2>`);
+
+  if (loc.glyphs) {
+    $("#main").append("<h4>Modified Glyphs</h4>");
+    let glyphs = $("<div>");
+    for (let glyph of loc.glyphs) {
+      addAGlyph(glyph, glyphs);
+    }
+    $("#main").append(glyphs);
+  }
+
+  if (loc.words) {
+    $("#main").append("<h4>Modified Words</h4>");
+    for (let [script, words] of Object.entries(loc.words)) {
+      let scriptTitle = $(`<h6>${script}</h6>`);
+      $("#main").append(scriptTitle);
+      let worddiv = $("<div>");
+      for (let word of words) {
+        addAWord(word, worddiv);
+      }
+      $("#main").append(worddiv);
+    }
+  }
+  $('[data-toggle="tooltip"]').tooltip();
+}
+
+$(function () {
+  if (report["tables"]) {
+    diffTables(report);
+  }
+  if (report["kerns"]) {
+    diffKerns(report);
+  }
+  cmapDiff(report);
+  $('[data-toggle="tooltip"]').tooltip();
+  if (!report["locations"]) {
+    $("#title").html("<h4 class='mt-2'>No differences found</h4>");
+    $("#ui-nav").hide();
+    return;
+  }
+
+  for (var [index, loc] of report["locations"].entries()) {
+    var loc_nav = $(`<li class="nav-item">
+		<a class="nav-link text-secondary" href="#" data-index="${index}">${loc.location.replaceAll(
+      ",",
+      ",\u200b"
+    )}</a>
+	</li>`);
+    $("#locationnav").append(loc_nav);
+  }
+  $("#locationnav li a").on("click", function (e) {
+    $("#locationnav li a").removeClass("active");
+    $(this).addClass("active");
+    buildLocation_statichtml(report.locations[$(this).data("index")]);
+  });
+  $("#locationnav li a").eq(0).click();
+
+  document.styleSheets[0].cssRules[0].style.setProperty(
+    "src",
+    "url(old-NotoSansSamaritan-Regular.ttf)"
+  );
+  document.styleSheets[0].cssRules[1].style.setProperty(
+    "src",
+    "url(new-NotoSansSamaritan-Regular.ttf)"
+  );
+  setupAnimation();
+});
+
+	</script>
+</body>
+
+</html>
